@@ -212,6 +212,16 @@ statement returns [int attr_type]
       } if_then_statements {
         TextCode.add(L + ":");
       }
+    | WHILE '(' Identifier ')' {
+        String L_loop_start = newLabel();
+        String L_loop_break = newLabel();
+        TextCode.add(L_loop_start + ":");
+        TextCode.add("\t cmpl " + "$0, " + $Identifier.text + "(\%rip)");
+        TextCode.add("\t je " + L_loop_break);
+      } if_then_statements {
+        TextCode.add("\t jmp " + L_loop_start);
+        TextCode.add(L_loop_break + ":");
+      }
     | printf_stat
     ;
 
@@ -333,6 +343,7 @@ printf_stat
 INT:'int';
 VOID: 'void';
 IF: 'if';
+WHILE: 'while';
 
 Identifier:('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*;
 Integer_constant:'0'..'9'+;
